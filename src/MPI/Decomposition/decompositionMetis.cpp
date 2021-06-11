@@ -32,7 +32,7 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
     /* idx_t is a typedef of int32_t used by METIS */
     idx_t ncon;
     idx_t nparts;
-    idx_t objval;
+    idx_t edgecut;
     idx_t nvtxs;
     int error = METIS_ERROR;
 
@@ -48,7 +48,10 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
      *  - keep number of balancing constraints equal to 1
      *  - note that `nvtxs` has to be defined
      */
-    NOT_IMPLEMENTED
+    // NOT_IMPLEMENTED
+    nvtxs = graph.getRows();
+    ncon = 1;
+    nparts = getNumProcs();
 
     part.resize(nvtxs);
 
@@ -61,8 +64,20 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
         return EXIT_SUCCESS;
     }
 
-    // error = METIS_PartGraphKway(...);
-    NOT_IMPLEMENTED
+    error = METIS_PartGraphKway(&nvtxs,
+                                &ncon,
+                                graph.getOffsets().data(),
+                                graph.getNodes().data(),
+                                weights,
+                                NULL,
+                                NULL,
+                                &nparts,
+                                NULL,
+                                NULL,
+                                NULL,
+                                &edgecut,
+                                part.data());
+    // NOT_IMPLEMENTED
 
     if (error == METIS_OK) {
         assembleMapOfProcesses(graph);
