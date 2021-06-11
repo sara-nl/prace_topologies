@@ -27,17 +27,19 @@
 
 void Topologies::createCartTopology(IndicesIJ struct_part) {
 
-    int ndims;
-    int dims[2];
-    int periods[2];
-    int reorder;
+    int ndims = 2;
+    int dims[2] = {struct_part.i, struct_part.j};
+    int periods[2] = {false, false};
+    int reorder = 0;
 
     /*
      * Define the above variables and create a Cartesian topology
      * Hints:
      *  - use already declared private variable `comm` to store the communicator
      */
-    NOT_IMPLEMENTED
+    // NOT_IMPLEMENTED
+    MPI_Cart_create(MPI_COMM_WORLD, ndims, dims, periods, reorder, &comm);
+
 }
 
 void Topologies::createGraphTopology(DecompositionMetis& decomp_metis, int root_pid) {
@@ -57,7 +59,17 @@ void Topologies::createGraphTopology(DecompositionMetis& decomp_metis, int root_
      *  - get number of neighbors: loc_map_of_ngb.size()
      *  - get a list of neighbors: loc_map_of_ngb.data()
      */
-    NOT_IMPLEMENTED
+    // NOT_IMPLEMENTED
+    MPI_Dist_graph_create_adjacent(MPI_COMM_WORLD,
+                                   loc_map_of_ngb.size(),
+                                   loc_map_of_ngb.data(),
+                                   MPI_UNWEIGHTED,
+                                   loc_map_of_ngb.size(),
+                                   loc_map_of_ngb.data(),
+                                   MPI_UNWEIGHTED,
+                                   MPI_INFO_NULL,
+                                   reorder,
+                                   &comm);
 }
 
 void Topologies::testCartTopology() {
@@ -67,7 +79,31 @@ void Topologies::testCartTopology() {
      * Get rank of the process by the coordinates
      * Perform shift and test what processes are visible to the current one
      */
-    NOT_IMPLEMENTED
+    // NOT_IMPLEMENTED
+
+    int maxdims = 2;
+    int coords[2];
+    int rank = getMyRank();
+
+    if (getMyRank() == 0)
+        std::cout << "\nResult of MPI_Cart_coords():" << "\n";
+    MPI_Cart_coords(comm, getMyRank(), maxdims, coords);
+    std::cout << "PID: " << getMyRank() << "; Coordinates: " << coords[0] << "," << coords[1] << "\n";
+    MPI_Barrier(comm);
+
+    if (getMyRank() == 0)
+        std::cout << "\nResult of MPI_Cart_rank():" << "\n";
+    coords[0] = 1;
+    coords[1] = 1;
+    MPI_Cart_rank(comm, coords, &rank);
+    std::cout << "PID: " << rank << "; Coordinates: " << coords[0] << "," << coords[1] << "\n";
+
+    if (getMyRank() == 0)
+        std::cout << "\nResult of MPI_Cart_shift():" << "\n";
+    int rank_src, rank_dst;
+    MPI_Cart_shift(comm, 0, -1, &rank_src, &rank_dst);
+    std::cout << "PID: " << rank << " sees: " << rank_src << " " << rank_dst << " " << MPI_PROC_NULL << "\n";
+
 }
 
 void Topologies::testGraphTopology() {
@@ -76,7 +112,42 @@ void Topologies::testGraphTopology() {
      * Find the number of neighboring processes
      * Find the list of neighboring processes
      */
-    NOT_IMPLEMENTED
+    // NOT_IMPLEMENTED
+    int my_rank = getMyRank();
+
+    if (getMyRank() == 0)
+        std::cout << "\nResult of MPI_Dist_graph_neighbors_count():" << "\n";
+    // Count neighbors
+    int inn_ngbs, out_ngbs, is_weighted;
+    MPI_Dist_graph_neighbors_count(comm, &inn_ngbs, &out_ngbs, &is_weighted);
+    std::cout << "PID: " << my_rank
+              << "; inn_ngbs : " << inn_ngbs
+              << "; out_ngbs : " << out_ngbs
+              << "; is weghted : " << is_weighted << std::endl;
+
+    if (getMyRank() == 0)
+        std::cout << "\nResult of MPI_Dist_graph_neighbors():" << "\n";
+    int src[inn_ngbs], src_weights[inn_ngbs];
+    int dest[out_ngbs], dest_weights[out_ngbs];
+    MPI_Dist_graph_neighbors(comm, inn_ngbs, src, src_weights, out_ngbs, dest, dest_weights);
+
+    for (int pid = 0; pid < getNumProcs(); ++pid) {
+        if (pid == my_rank) {
+            std::cout << "PID: " << pid << "\n";
+            std::cout << "PIDs for incoming edges: ";
+            for (int n = 0; n < inn_ngbs; ++n) {
+                std::cout << src[n] << " ";
+            }
+            std::cout << "\n";
+            std::cout << "PIDs for outgoing edges: ";
+            for (int n = 0; n < out_ngbs; ++n) {
+                std::cout << dest[n] << " ";
+            }
+            std::cout << "\n\n";
+        }
+        MPI_Barrier(comm);
+    }
+
 }
 
 std::vector<int> Topologies::distributeGraph(DecompositionMetis& decomp_metis, int root_pid) {

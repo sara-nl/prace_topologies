@@ -115,6 +115,10 @@ int main(int argc, char** argv) {
     /* Perform some calculations and report the elapsed time */
     elp_times[0] = helper.tic();
     res = field.performDummyWork();
+    // topology.createCartTopology(struct_part);
+    // topology.testCartTopology();
+    // topology.createGraphTopology(decomp_metis, root_pid);
+    // topology.testGraphTopology();
     elp_times[1] = helper.toc();
 
     /* Print result for the verification */
