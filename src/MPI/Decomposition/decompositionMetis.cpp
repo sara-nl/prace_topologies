@@ -45,6 +45,7 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
      *  - get raw pointer to the array of offsets: graph.getOffsets().data()
      *  - get raw pointer to the adjacency list:   graph.getNodes().data()
      *  - get raw pointer to the partitioning:     part.data()
+     *  - get number of processes:                 getNumprocs()
      *
      * Partitioning:
      *  - keep number of balancing constraints equal to 1
