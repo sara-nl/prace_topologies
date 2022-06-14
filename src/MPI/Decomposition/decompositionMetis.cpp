@@ -32,8 +32,10 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
     /* idx_t is a typedef of int32_t used by METIS */
     idx_t ncon;
     idx_t nparts;
-    idx_t objval;
+    idx_t edgecut;
     idx_t nvtxs;
+    idx_t *xadj;
+    idx_t *adjncy;
     int error = METIS_ERROR;
 
     /*
@@ -63,6 +65,12 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
 
     // error = METIS_PartGraphKway(...);
     NOT_IMPLEMENTED
+    // Keep the following arguments NULL: 
+    // - the size of the vertices for computing the total communication volume
+    // - the weights of the edges
+    // - desired weight for each partition and constraint
+    // - the allowed load imbalance tolerance for each constraint
+    // - an array of options
 
     if (error == METIS_OK) {
         assembleMapOfProcesses(graph);
