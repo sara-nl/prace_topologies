@@ -40,16 +40,18 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
 
     /*
      * Hints
-     * Get data:
-     *  - get number of nodes in the graph:        graph.getRows()
-     *  - get raw pointer to the array of offsets: graph.getOffsets().data()
-     *  - get raw pointer to the adjacency list:   graph.getNodes().data()
-     *  - get raw pointer to the partitioning:     part.data()
-     *  - get number of processes:                 getNumprocs()
+     * Step1: 
+     *  Get data:
+     *   - get the number of nodes in the graph:        graph.getRows()
+     *   - get the raw pointer to the array of offsets: graph.getOffsets().data()
+     *   - get the raw pointer to the adjacency list:   graph.getNodes().data()
+     *   - get the raw pointer to the partitioning:     part.data()
+     *   - get the number of processes:                 getNumprocs()
      *
-     * Partitioning:
-     *  - keep number of balancing constraints equal to 1
-     *  - note that `nvtxs` has to be defined
+     * Step 2:
+     *   Execute partitioning:
+     *    - keep the number of balancing constraints equal to 1
+     *    - note that `nvtxs` has to be defined
      */
     NOT_IMPLEMENTED
 
@@ -65,13 +67,14 @@ int DecompositionMetis::decompose(Graph &graph, int32_t* weights) {
     }
 
     // error = METIS_PartGraphKway(...);
-    NOT_IMPLEMENTED
     // Keep the following arguments NULL: 
+    // - the number of balancing constraints is 1
     // - the size of the vertices for computing the total communication volume
     // - the weights of the edges
     // - desired weight for each partition and constraint
     // - the allowed load imbalance tolerance for each constraint
     // - an array of options
+    NOT_IMPLEMENTED
 
     if (error == METIS_OK) {
         assembleMapOfProcesses(graph);
