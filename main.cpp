@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Maksim Masterov, SURF
+ * Copyright (c) 2024 Maksim Masterov, SURF
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
     helper.parseInput(argc, argv, elts_glob, struct_part, type);
     num_glob_elts = elts_glob.i * elts_glob.j;
 
-    /* Generate initial field and distribute the data by the root process */
+    /* Generate initial field and decompose the data by the root process */
     if (getMyRank() == root_pid) {
         field.initialize(elts_glob, elts_glob);
         field.generate();
@@ -104,9 +104,13 @@ int main(int argc, char** argv) {
 
             partitioning = decomp_metis.getPartitioning().data();
         }
+        else {
+            printByRoot("Unknown decomposition type");
+            terminateExecution();
+        }
     }
 
-    /* Decompose the field */
+    /* Distribute the field */
     field.distribute(partitioning, num_glob_elts, root_pid);
 
     /* Print local field for debugging */
