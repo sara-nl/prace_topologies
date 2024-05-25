@@ -157,8 +157,8 @@ void DecompositionStruct::print(const std::string file_name, const IndicesIJ elt
 
         if (out_str.is_open()) {
             out_str << "\n";
-            for (int32_t i = 0; i < elts_glob.i; ++i) {
-                for (int32_t j = 0; j < elts_glob.j; ++j) {
+            for (int32_t j = 0; j < elts_glob.j; ++j) {
+                for (int32_t i = 0; i < elts_glob.i; ++i) {
                     id = j + elts_glob.j * i;
                     out_str << part[id] << " ";
                 }
